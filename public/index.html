@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skribble Clone</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- Google Fonts for modern typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="light-mode">
+    <!-- Global UI Controls (Dark Mode, Audio) -->
+    <div class="global-controls">
+        <button id="themeToggleBtn" title="Toggle Dark/Light Mode"><i class="fas fa-moon"></i></button>
+        <button id="soundToggleBtn" title="Toggle Sound"><i class="fas fa-volume-up"></i></button>
+    </div>
+
+
+    <div id="app">
+        
+        <!-- HOME SCREEN -->
+        <section id="home-screen" class="screen active">
+            <div class="glass-panel home-container">
+                <!-- Decorative floating glass orb -->
+                <div class="glass-orb"></div>
+
+                <!-- Branding -->
+                <div class="home-branding">
+                    <h1 class="logo">Skribble<span>.cool</span></h1>
+                    <p class="tagline">THE DRAWING GAME EXPERIENCE</p>
+                </div>
+
+                <!-- Avatar Picker & Input -->
+                <div class="home-section">
+                    <span class="section-label">Player Avatar</span>
+                    <div id="avatarPicker" class="avatar-picker"></div>
+                </div>
+
+                <div class="home-section">
+                    <span class="section-label">Player Identity</span>
+                    <div class="join-group">
+                        <input type="text" id="usernameInput" placeholder="Enter your name" maxlength="15" autocomplete="off">
+                    </div>
+                </div>
+
+                <!-- Action Buttons — stacked full-width pills -->
+                <div class="home-actions">
+                    <button id="createRoomBtn" class="btn btn-primary btn-full"><i class="fas fa-plus-circle"></i> Create Room</button>
+                    <button id="joinRoomBtn" class="btn btn-outline btn-full" onclick="document.getElementById('joinModal').classList.remove('hidden')"><i class="fas fa-door-open"></i> Join Room</button>
+                </div>
+            </div>
+
+            <!-- Join Room Modal Overlay -->
+            <div id="joinModal" class="modal-overlay hidden">
+                <div class="glass-panel modal-panel">
+                    <h3>Join a Room</h3>
+                    <p class="modal-subtitle">Enter the room code shared by your friend</p>
+                    <div class="underline-input">
+                        <input type="text" id="joinRoomIdInput" placeholder="Room Code" autocomplete="off" style="text-transform: uppercase; letter-spacing: 4px; text-align: center; font-weight: 700;">
+                    </div>
+                    <div class="modal-actions">
+                        <button id="joinRoomSubmitBtn" class="btn btn-primary btn-full"><i class="fas fa-sign-in-alt"></i> Join</button>
+                        <button class="btn btn-outline btn-full" onclick="document.getElementById('joinModal').classList.add('hidden')">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- LOBBY SCREEN -->
+        <section id="lobby-screen" class="screen hidden">
+            <div class="lobby-header glass-panel">
+                <div class="room-info">
+                    <span>Room: <strong id="lobbyRoomIdDisplay">-------</strong></span>
+                    <button id="copyLinkBtn" class="btn-icon" title="Copy Invite Link"><i class="fas fa-copy"></i></button>
+                </div>
+                <button id="startGameBtn" class="btn btn-primary hidden">Start Game</button>
+            </div>
+            
+            <div class="lobby-content">
+                <div class="lobby-players glass-panel">
+                    <h3>Players (<span id="playerCount">1</span>/<span id="maxNumPlayers">10</span>)</h3>
+                    <ul id="lobbyPlayerList" class="player-list">
+                        <!-- Player items -->
+                    </ul>
+                </div>
+
+                <div class="lobby-settings glass-panel">
+                    <h3>Game Settings</h3>
+                    <div class="settings-form">
+                        <div class="form-group">
+                            <label>Rounds</label>
+                            <select id="settingRounds" disabled>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3" selected>3</option>
+                                <option value="5">5</option>
+                                <option value="10">10</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Draw Time (sec)</label>
+                            <select id="settingTime" disabled>
+                                <option value="30">30</option>
+                                <option value="60">60</option>
+                                <option value="90" selected>90</option>
+                                <option value="120">120</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Difficulty</label>
+                            <select id="settingDifficulty" disabled>
+                                <option value="easy">Easy</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="hard">Hard</option>
+                            </select>
+                        </div>
+                        
+                        <details class="advanced-settings">
+                            <summary>Advanced Settings</summary>
+                            <div class="form-group">
+                                <label>Word Choices per Turn</label>
+                                <select id="settingWordChoices" disabled>
+                                    <option value="2">2</option>
+                                    <option value="3" selected>3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Custom Words (comma separated)</label>
+                                <textarea id="settingCustomWords" placeholder="word1, word2, word3..." disabled></textarea>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- GAME SCREEN -->
+        <section id="game-screen" class="screen hidden">
+            <div class="game-topbar glass-panel">
+                <div class="timer-container">
+                    <i class="fas fa-clock"></i> <span id="gameTimer">90</span>
+                </div>
+                <div class="word-hint-container">
+                    <span id="gameWordHint">_ _ _ _ _</span>
+                </div>
+                <div class="round-info">
+                    Round <span id="gameRoundDisplay">1/3</span>
+                </div>
+            </div>
+
+            <div class="game-main">
+                <div class="game-left glass-panel">
+                    <div class="players-header">
+                        <h3>Scores</h3>
+                        <button id="statsBtn" class="btn-icon" title="View Stats"><i class="fas fa-chart-bar"></i></button>
+                    </div>
+                    <ul id="gamePlayerList" class="player-list">
+                        <!-- Game players -->
+                    </ul>
+                </div>
+
+                <div class="game-center">
+                    <div id="canvasContainer" class="canvas-wrapper">
+                        <!-- Word Selection overlay -->
+                        <div id="wordSelectionOverlay" class="overlay hidden">
+                            <h2>Choose a word</h2>
+                            <div id="wordChoices" class="word-choices">
+                                <!-- Option buttons injected here -->
+                            </div>
+                        </div>
+                        <!-- Canvas element -->
+                        <canvas id="drawingCanvas"></canvas>
+                        <!-- Confetti/Animations overlay -->
+                        <canvas id="confettiCanvas" class="hidden"></canvas>
+                    </div>
+                    
+                    <div class="drawing-tools glass-panel">
+                        <div class="tool-group">
+                            <button class="tool-btn active" id="toolPen" title="Pen"><i class="fas fa-pen"></i></button>
+                            <button class="tool-btn" id="toolEraser" title="Eraser"><i class="fas fa-eraser"></i></button>
+                        </div>
+                        <div class="tool-group colors" id="colorPalette">
+                            <!-- Colors injected via JS -->
+                        </div>
+                        <div class="tool-group size-slider">
+                            <i class="fas fa-circle" style="font-size:8px;"></i>
+                            <input type="range" id="toolSize" min="1" max="50" value="5">
+                            <i class="fas fa-circle" style="font-size:18px;"></i>
+                        </div>
+                        <div class="tool-group">
+                            <button class="tool-btn" id="toolClear" title="Clear Canvas" style="color:var(--danger);"><i class="fas fa-trash"></i></button>
+                            <button class="tool-btn" id="toolSkip" title="Vote to Skip"><i class="fas fa-forward"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="game-right glass-panel">
+                    <div id="chatHistory" class="chat-history">
+                        <!-- Chat messages -->
+                    </div>
+                    <form id="chatForm" class="chat-inputbar">
+                        <button type="button" id="emojiBtn" class="btn-icon"><i class="far fa-smile"></i></button>
+                        <input type="text" id="chatInput" placeholder="Guess the word..." autocomplete="off">
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- RESULT SCREEN -->
+        <section id="result-screen" class="screen hidden">
+            <div class="result-container glass-panel">
+                <h1 id="resultTitle">Game Over!</h1>
+                <div class="winner-display">
+                    <i class="fas fa-crown fa-3x" style="color: gold; margin-bottom: 10px;"></i>
+                    <h2 id="winnerName">Player</h2>
+                    <p>is the winner!</p>
+                </div>
+                <div class="leaderboard">
+                    <h3>Final Scores</h3>
+                    <ul id="finalScoreList">
+                        <!-- Final scores -->
+                    </ul>
+                </div>
+                <div class="action-buttons">
+                    <button id="playAgainBtn" class="btn btn-primary hidden">Play Again</button>
+                    <button id="backToLobbyBtn" class="btn btn-secondary hidden">Back to Lobby</button>
+                    <button id="exportHistoryBtn" class="btn btn-outline"><i class="fas fa-download"></i> Export History</button>
+                </div>
+            </div>
+        </section>
+
+    </div>
+    
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/utils.js" type="module"></script>
+    <script src="/js/socket.js" type="module"></script>
+    <script src="/js/ui.js" type="module"></script>
+    <script src="/js/canvas.js" type="module"></script>
+    <script src="/js/game.js" type="module"></script>
+    <script src="/js/main.js" type="module"></script>
+</body>
+</html>
